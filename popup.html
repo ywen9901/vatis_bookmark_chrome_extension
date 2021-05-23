@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Document</title>
+        <style>
+            div{
+                text-align: center;
+            }
+            p {
+                padding: 3px;
+            }
+            select {
+                border: 0;
+                margin-bottom: 15px;
+                padding: 10px;
+            }
+            button {
+                padding: 5px 10px;
+                background-color: #707070;
+                border: none;
+                color: white;
+                text-align: center;
+                opacity: 0.6;
+                transition: 0.3s;
+                display: inline-block;
+                text-decoration: none;
+                cursor: pointer;
+            }
+            button:hover {
+                opacity: 1;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <p><b>Select Your Plan to Add</b></p>
+            <select id="selector">
+                <option>2021.05.23彰化一日遊</option>
+                <option>2021春遊</option>
+                <option>宜蘭溫泉旅行</option>
+            </select>
+            <button id="btn">Add</button>
+        </div>
+
+        <script src="popup.js" charset="UTF-8"></script>
+    </body>
+</html>
