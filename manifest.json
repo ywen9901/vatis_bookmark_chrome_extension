@@ -11,5 +11,5 @@
         "page": "background.html",
         "persistent": false
     },
-    "permissions": ["tabs"]
+    "permissions": ["tabs", "identity", "identity.email"]
 }

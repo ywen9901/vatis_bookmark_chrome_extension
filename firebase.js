@@ -10,6 +10,8 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 console.log(firebase);
 
+const getSubCollections = firebase.functions().httpsCallable('getSubCollections');
+
 var db = firebase.firestore();
 console.log(db);
   
@@ -34,48 +36,62 @@ console.log(db);
     // select.appendChild(opt);
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-    if(msg.command == 'fetch') {
-        db.collection('notes').get().then((querySnapshot) => {
-            var notes = new Array();
-            querySnapshot.forEach((note) => {
-                notes.push(note.id);
-            })
-            console.log(notes);
-            sendResponse({data: notes});
-        })
-        return true;
-    }
-
-    if(msg.command == 'add') {
-        chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
-            let url = tabs[0].url;
-            console.log(`${msg.data.folder} ${url}`)
-
-            var content = db.collection('notes').doc(msg.data.folder)
-            
-            db.collection('notes').doc(msg.data.folder).collection('bookmark').get().then((res) => {
-                var size = 0;
-
-                res.forEach((doc) => {
-                    size = size + 1;
-                })
-
-                console.log(size);
-
-                db.collection('notes').doc(msg.data.folder).collection('bookmark').doc(`url${size}`).set({
-                    url: url
-                },  { merge: true })
-                .then(() => {
-                    alert("Document successfully written!");
-                })
-                .catch((error) => {
-                    alert("Error writing document: ", error);
-                })
-            })
-        });
-        return true;
-    }
     
+    chrome.identity.getProfileUserInfo((userinfo) => {
+        const user = userinfo.email;
+
+        if(msg.command == 'fetchFolder') {
+            getSubCollections({ docPath: 'users/yww9901@gmail.com' }).then(function(result) {
+                sendResponse({ data: result.data.collections });
+            }).catch(function(error) {
+                console.error(error)
+            });
+        }
+        
+        if(msg.command == 'fetchPlan') {
+            console.log(msg.data)
+            db.collection('users').doc(user).collection(msg.data).get().then((querySnapshot) => {
+                var notes = new Array();
+                querySnapshot.forEach((note) => {
+                    notes.push(note.id);
+                })
+                console.log(notes);
+                sendResponse({data: notes});
+            })
+        }
+    
+        if(msg.command == 'add') {
+            chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
+                const url = tabs[0].url;
+                console.log(`${msg.data.folder} ${msg.data.plan} ${url}`)
+    
+                var content = db.collection('users').doc(user).collection(msg.data.folder).doc(msg.data.plan)
+                
+                /// users/yww9901@gmail.com/桃園/SMTLiYlAcxhKAhlt6v7r/bookmark
+                db.collection('users').doc(user).collection(msg.data.folder).doc(msg.data.plan).collection('bookmark').get().then((res) => {
+                    var size = 0;
+    
+                    res.forEach((doc) => {
+                        size = size + 1;
+                    })
+    
+                    console.log(size);
+    
+                    db.collection('users').doc(user).collection(msg.data.folder).doc(msg.data.plan).collection('bookmark').doc(`url${size}`).set({
+                        url: url
+                    },  { merge: true })
+                    .then(() => {
+                        alert("Document successfully written!");
+                    })
+                    .catch((error) => {
+                        alert("Error writing document: ", error);
+                    })
+                })
+            });
+        }
+    })
+
+    return true;
     // alert(`${request} ${window.location.href}`)
     // if(msg.command == "post") {
     //     console.log("do post");

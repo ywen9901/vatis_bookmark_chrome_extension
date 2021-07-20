@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //     document.body.appendChild(div)
     // })
 
-    chrome.runtime.sendMessage({command: "fetch"}, (response) => {
+    chrome.runtime.sendMessage({command: "fetchFolder"}, (response) => {
         response.data.forEach(element => {
             var select = document.getElementById('selector');
             var opt = document.createElement('option');
@@ -14,20 +14,42 @@ document.addEventListener('DOMContentLoaded', () => {
             select.appendChild(opt);
         });
     });
+    
+    document.getElementById('selector').addEventListener('change', onchange, false)
+
+    function onchange() {
+        console.log('changed')
+        const bg = chrome.extension.getBackgroundPage()
+        var e = document.getElementById("selector");
+        var strUser = e.options[e.selectedIndex].text;
+
+        chrome.runtime.sendMessage({command: "fetchPlan", data: strUser}, (response) => {
+            response.data.forEach(element => {
+                var select = document.getElementById('selector2');
+                var opt = document.createElement('option');
+                opt.innerHTML = element;
+                select.appendChild(opt);
+            });
+        });
+    }
 
     document.getElementById('btn').addEventListener('click', onclick, false)
     
     function onclick() {
         const bg = chrome.extension.getBackgroundPage()
-        var e = document.getElementById("selector");
-        var strUser = e.options[e.selectedIndex].text;
+
+        var folder = document.getElementById("selector");
+        var folderV = folder.options[folder.selectedIndex].text;
+
+        var plan = document.getElementById("selector2");
+        var planV = plan.options[plan.selectedIndex].text;
         // chrome.tabs.query(
         //     {currentWindow: true, active: true},
         //     function(tabs) {
         //         chrome.tabs.sendMessage(tabs[0].id, strUser)
         //     }
         // )
-        chrome.runtime.sendMessage({command: "add", data: {folder: strUser}}, (res) => {
+        chrome.runtime.sendMessage({command: "add", data: {folder: folderV, plan: planV}}, (res) => {
             window.close();
         });
     }
