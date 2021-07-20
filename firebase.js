@@ -41,7 +41,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         const user = userinfo.email;
 
         if(msg.command == 'fetchFolder') {
-            getSubCollections({ docPath: 'users/yww9901@gmail.com' }).then(function(result) {
+            getSubCollections({ docPath: 'users/' + user }).then(function(result) {
                 sendResponse({ data: result.data.collections });
             }).catch(function(error) {
                 console.error(error)
@@ -69,15 +69,17 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
                 
                 /// users/yww9901@gmail.com/桃園/SMTLiYlAcxhKAhlt6v7r/bookmark
                 db.collection('users').doc(user).collection(msg.data.folder).doc(msg.data.plan).collection('bookmark').get().then((res) => {
-                    var size = 0;
+                    // var size = 0;
     
-                    res.forEach((doc) => {
-                        size = size + 1;
-                    })
+                    // res.forEach((doc) => {
+                    //     size = size + 1;
+                    // })
     
-                    console.log(size);
+                    // console.log(size);
     
-                    db.collection('users').doc(user).collection(msg.data.folder).doc(msg.data.plan).collection('bookmark').doc(`url${size}`).set({
+                    var path = db.collection('users').doc(user).collection(msg.data.folder).doc(msg.data.plan).collection('bookmark').doc()
+                    
+                    path.set({
                         url: url
                     },  { merge: true })
                     .then(() => {
