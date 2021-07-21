@@ -61,14 +61,17 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         }
     
         if(msg.command == 'add') {
-            chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
+            if(msg.data.folder.includes('select an option') || msg.data.plan.includes('select an option')) {
+                alert('Please select your folder and choose a plan to add bookmarks.')
+            } else {
+                chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
                 const url = tabs[0].url;
                 console.log(`${msg.data.folder} ${msg.data.plan} ${url}`)
     
                 var content = db.collection('users').doc(user).collection(msg.data.folder).doc(msg.data.plan)
                 
                 /// users/yww9901@gmail.com/桃園/SMTLiYlAcxhKAhlt6v7r/bookmark
-                db.collection('users').doc(user).collection(msg.data.folder).doc(msg.data.plan).collection('bookmark').get().then((res) => {
+                // db.collection('users').doc(user).collection(msg.data.folder).doc(msg.data.plan).collection('bookmarks').get().then((res) => {
                     // var size = 0;
     
                     // res.forEach((doc) => {
@@ -76,20 +79,22 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
                     // })
     
                     // console.log(size);
-    
-                    var path = db.collection('users').doc(user).collection(msg.data.folder).doc(msg.data.plan).collection('bookmark').doc()
-                    
-                    path.set({
-                        url: url
-                    },  { merge: true })
-                    .then(() => {
-                        alert("Document successfully written!");
-                    })
-                    .catch((error) => {
-                        alert("Error writing document: ", error);
-                    })
+
+                var path = db.collection('users').doc(user).collection(msg.data.folder).doc(msg.data.plan).collection('bookmarks').doc()
+                
+                path.set({
+                    url: url
+                },  { merge: true })
+                .then(() => {
+                    alert("Document successfully written!");
                 })
-            });
+                .catch((error) => {
+                    alert("Error writing document: ", error);
+                })
+                // })
+                });
+            }
+            
         }
     })
 
